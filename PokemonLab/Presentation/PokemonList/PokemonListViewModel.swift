@@ -3,6 +3,7 @@ import Foundation
 @Observable
 final class PokemonListViewModel {
     private(set) var state: LoadableState<[PokemonSummary]> = .idle
+    private(set) var reloadToken = UUID()
     var searchQuery: String = ""
 
     private let fetchList: FetchPokemonListUseCase
@@ -37,9 +38,20 @@ final class PokemonListViewModel {
 
     func load() async {
         state = .loading
+        await performFetch()
+    }
+
+    /// Pull-to-refresh entry point. Keeps the currently loaded list on screen
+    /// while the request is in flight, and only switches away on failure.
+    func refresh() async {
+        await performFetch()
+    }
+
+    private func performFetch() async {
         do {
             let list = try await fetchList()
             state = .loaded(list)
+            reloadToken = UUID()
         } catch {
             state = .failed(String(localized: "Impossible de charger le Pokédex. Vérifie ta connexion et réessaie."))
         }

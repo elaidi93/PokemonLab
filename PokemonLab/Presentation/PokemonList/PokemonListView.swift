@@ -12,17 +12,16 @@ struct PokemonListView: View {
                 prompt: Text("Rechercher un Pokémon")
             )
             .task { await viewModel.loadIfNeeded() }
-            .refreshable { await viewModel.load() }
+            .refreshable { await viewModel.refresh() }
     }
 
     @ViewBuilder
     private var content: some View {
         switch viewModel.state {
         case .idle, .loading:
-            ProgressView("Chargement…")
-                .controlSize(.large)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            placeholderList
                 .accessibilityIdentifier("list.loading")
+                .accessibilityLabel(Text("Chargement du Pokédex"))
 
         case .failed(let message):
             ErrorStateView(message: message) {
@@ -35,10 +34,30 @@ struct PokemonListView: View {
         }
     }
 
+    private var placeholderList: some View {
+        List(0..<8, id: \.self) { _ in
+            PokemonRowPlaceholder()
+                .padding(.vertical, 12)
+                .padding(.horizontal, 16)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color.brandSurface)
+                )
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                .accessibilityHidden(true)
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(Color(.systemBackground))
+        .allowsHitTesting(false)
+    }
+
     private var listContent: some View {
         List {
             ForEach(viewModel.visiblePokemon) { pokemon in
-                PokemonRow(pokemon: pokemon)
+                PokemonRow(pokemon: pokemon, reloadToken: viewModel.reloadToken)
                     .padding(.vertical, 12)
                     .padding(.horizontal, 16)
                     .background(
@@ -70,13 +89,15 @@ struct PokemonListView: View {
 
 private struct PokemonRow: View {
     let pokemon: PokemonSummary
+    let reloadToken: UUID
     @ScaledMetric private var spriteSize: CGFloat = 56
 
     var body: some View {
         HStack(spacing: 12) {
             AsyncImageView(
                 url: pokemon.spriteURL,
-                accessibilityDescription: String(localized: "Image de \(pokemon.name.capitalized)")
+                accessibilityDescription: String(localized: "Image de \(pokemon.name.capitalized)"),
+                reloadToken: reloadToken
             )
             .frame(width: spriteSize, height: spriteSize)
 
@@ -96,6 +117,30 @@ private struct PokemonRow: View {
                 .foregroundStyle(Color.accentColor)
                 .accessibilityHidden(true)
         }
+    }
+}
+
+private struct PokemonRowPlaceholder: View {
+    @ScaledMetric private var spriteSize: CGFloat = 56
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Circle()
+                .fill(Color.secondary.opacity(0.25))
+                .frame(width: spriteSize, height: spriteSize)
+
+            VStack(alignment: .leading, spacing: 8) {
+                RoundedRectangle(cornerRadius: 4, style: .continuous)
+                    .fill(Color.secondary.opacity(0.25))
+                    .frame(width: 140, height: 14)
+                RoundedRectangle(cornerRadius: 4, style: .continuous)
+                    .fill(Color.secondary.opacity(0.25))
+                    .frame(width: 60, height: 12)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .shimmering()
     }
 }
 
@@ -139,6 +184,14 @@ private struct ErrorStateView: View {
     NavigationStack {
         PokemonListView(
             viewModel: PreviewFactory.listViewModel(state: .failed("Impossible de charger le Pokédex."))
+        )
+    }
+}
+
+#Preview("Loading — shimmer") {
+    NavigationStack {
+        PokemonListView(
+            viewModel: PreviewFactory.listViewModel(state: .loading)
         )
     }
 }
