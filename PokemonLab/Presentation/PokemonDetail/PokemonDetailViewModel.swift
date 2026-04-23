@@ -43,7 +43,7 @@ final class PokemonDetailViewModel {
             let detail = try await fetchDetail(id: pokemonID)
             state = .loaded(detail)
         } catch {
-            state = .failed(String(localized: "detail.error.message"))
+            state = .failed(String(localized: "Impossible de charger les informations de ce Pokémon."))
         }
     }
 }
