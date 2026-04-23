@@ -13,6 +13,15 @@ final class PokemonListViewModel {
         self.coordinator = coordinator
     }
 
+    convenience init(
+        initialState: LoadableState<[PokemonSummary]>,
+        fetchList: FetchPokemonListUseCase,
+        coordinator: AppCoordinator
+    ) {
+        self.init(fetchList: fetchList, coordinator: coordinator)
+        self.state = initialState
+    }
+
     var visiblePokemon: [PokemonSummary] {
         guard let all = state.value else { return [] }
         let trimmed = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)
