@@ -4,7 +4,7 @@ import Testing
 
 @Suite("PokemonRepositoryImpl")
 struct PokemonRepositoryImplTests {
-    let baseURL = URL(string: "https://test.local/api")!
+    let baseURL = "https://test.local/api"
 
     @Test("fetchList hits /pokemon with limit and maps DTOs")
     func fetchListSuccess() async throws {

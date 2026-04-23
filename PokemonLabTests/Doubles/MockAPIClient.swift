@@ -1,32 +1,34 @@
 import Foundation
 @testable import PokemonLab
 
-final class MockAPIClient: APIClient, @unchecked Sendable {
+nonisolated final class MockAPIClient: APIClient, @unchecked Sendable {
     enum Behavior {
         case data(Data)
         case error(Error)
     }
 
-    private let lock = NSLock()
+    private let queue = DispatchQueue(label: "MockAPIClient.state")
     private var _responses: [String: Behavior] = [:]
-    private(set) var requestedURLs: [URL] = []
+    private var _requestedURLs: [URL] = []
+
+    var requestedURLs: [URL] {
+        queue.sync { _requestedURLs }
+    }
 
     func stub(_ url: URL, with behavior: Behavior) {
-        lock.lock(); defer { lock.unlock() }
-        _responses[url.absoluteString] = behavior
+        queue.sync { _responses[url.absoluteString] = behavior }
     }
 
     func stub(prefix: String, with behavior: Behavior) {
-        lock.lock(); defer { lock.unlock() }
-        _responses[prefix] = behavior
+        queue.sync { _responses[prefix] = behavior }
     }
 
     func get<T: Decodable & Sendable>(_ url: URL, as type: T.Type) async throws -> T {
-        lock.lock()
-        requestedURLs.append(url)
-        let behavior = _responses.first { url.absoluteString.hasPrefix($0.key) }?.value
-            ?? _responses[url.absoluteString]
-        lock.unlock()
+        let behavior: Behavior? = queue.sync {
+            _requestedURLs.append(url)
+            return _responses.first { url.absoluteString.hasPrefix($0.key) }?.value
+                ?? _responses[url.absoluteString]
+        }
 
         guard let behavior else {
             throw APIError.invalidResponse(statusCode: 404)

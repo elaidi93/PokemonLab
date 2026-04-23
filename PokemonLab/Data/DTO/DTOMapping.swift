@@ -1,6 +1,6 @@
 import Foundation
 
-extension PokemonListDTO.Entry {
+nonisolated extension PokemonListDTO.Entry {
     /// PokeAPI list URLs look like `https://pokeapi.co/api/v2/pokemon/25/`.
     /// The id is the last non-empty path component.
     func toDomain() -> PokemonSummary? {
@@ -24,7 +24,7 @@ extension PokemonListDTO.Entry {
     }
 }
 
-extension PokemonDetailDTO {
+nonisolated extension PokemonDetailDTO {
     func toDomain() -> PokemonDetail {
         PokemonDetail(
             id: id,

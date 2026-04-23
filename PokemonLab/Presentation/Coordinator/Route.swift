@@ -1,5 +1,5 @@
 import Foundation
 
-enum Route: Hashable {
+nonisolated enum Route: Hashable {
     case detail(pokemonID: Int, name: String)
 }

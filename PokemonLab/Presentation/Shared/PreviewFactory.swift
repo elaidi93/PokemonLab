@@ -4,7 +4,7 @@ import Foundation
 /// Stubbed dependencies used only by SwiftUI previews. Kept behind `#if DEBUG`
 /// so no preview-only code ships in Release builds.
 enum PreviewFactory {
-    static let samplePokemon: [PokemonSummary] = [
+    nonisolated static let samplePokemon: [PokemonSummary] = [
         PokemonSummary(id: 1, name: "bulbasaur", spriteURL: spriteURL(1)),
         PokemonSummary(id: 4, name: "charmander", spriteURL: spriteURL(4)),
         PokemonSummary(id: 7, name: "squirtle", spriteURL: spriteURL(7)),
@@ -12,7 +12,7 @@ enum PreviewFactory {
         PokemonSummary(id: 150, name: "mewtwo", spriteURL: spriteURL(150)),
     ]
 
-    static let pikachuDetail = PokemonDetail(
+    nonisolated static let pikachuDetail = PokemonDetail(
         id: 25,
         name: "pikachu",
         heightDecimetres: 4,
@@ -44,8 +44,15 @@ enum PreviewFactory {
         )
     }
 
-    private static func spriteURL(_ id: Int) -> URL {
-        URL(string: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/\(id).png")!
+    /// Compile-time-known URL. A failure here is a developer error caught during preview,
+    /// never a runtime concern — hence the trap with a descriptive message rather than
+    /// a force-unwrap or a swallowed optional.
+    nonisolated private static func spriteURL(_ id: Int) -> URL {
+        let raw = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/\(id).png"
+        guard let url = URL(string: raw) else {
+            preconditionFailure("Invalid static sprite URL: \(raw)")
+        }
+        return url
     }
 
     private struct PreviewRepository: PokemonRepository {

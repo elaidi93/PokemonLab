@@ -1,6 +1,6 @@
 import Foundation
 
-struct FetchPokemonDetailUseCase: Sendable {
+nonisolated struct FetchPokemonDetailUseCase: Sendable {
     private let repository: any PokemonRepository
 
     init(repository: any PokemonRepository) {

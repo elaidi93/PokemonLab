@@ -1,6 +1,6 @@
 import Foundation
 
-enum LoadableState<Value: Sendable>: Sendable {
+nonisolated enum LoadableState<Value: Sendable>: Sendable {
     case idle
     case loading
     case loaded(Value)

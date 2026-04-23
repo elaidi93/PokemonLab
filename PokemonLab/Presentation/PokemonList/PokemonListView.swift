@@ -19,7 +19,7 @@ struct PokemonListView: View {
     private var content: some View {
         switch viewModel.state {
         case .idle, .loading:
-            ProgressView(Text("Chargement…"))
+            ProgressView("Chargement…")
                 .controlSize(.large)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .accessibilityIdentifier("list.loading")

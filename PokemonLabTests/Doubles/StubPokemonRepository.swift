@@ -1,7 +1,7 @@
 import Foundation
 @testable import PokemonLab
 
-final class StubPokemonRepository: PokemonRepository, @unchecked Sendable {
+nonisolated final class StubPokemonRepository: PokemonRepository, @unchecked Sendable {
     var listResult: Result<[PokemonSummary], Error> = .success([])
     var detailResult: Result<PokemonDetail, Error> = .failure(APIError.invalidResponse(statusCode: 404))
     private(set) var listCalls = 0
