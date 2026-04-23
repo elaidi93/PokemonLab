@@ -6,11 +6,16 @@ import Testing
 struct DTOMappingTests {
     @Test("List entry extracts the numeric id from the PokeAPI URL")
     func parsesIDFromEntryURL() throws {
+        // Given
         let entry = PokemonListDTO.Entry(
             name: "pikachu",
             url: "https://pokeapi.co/api/v2/pokemon/25/"
         )
+
+        // When
         let domain = try #require(entry.toDomain())
+
+        // Then
         #expect(domain.id == 25)
         #expect(domain.name == "pikachu")
         #expect(domain.spriteURL.absoluteString.hasSuffix("/25.png"))
@@ -25,23 +30,37 @@ struct DTOMappingTests {
         ]
     )
     func parsesIDFromVariousURLShapes(urlString: String, expected: Int) {
-        #expect(PokemonListDTO.Entry.parseID(from: urlString) == expected)
+        // Given / When
+        let id = PokemonListDTO.Entry.parseID(from: urlString)
+
+        // Then
+        #expect(id == expected)
     }
 
     @Test("List entry with a non-numeric URL segment is dropped")
     func rejectsMalformedURL() {
+        // Given
         let entry = PokemonListDTO.Entry(name: "???", url: "not-a-url")
-        #expect(entry.toDomain() == nil)
+
+        // When
+        let domain = entry.toDomain()
+
+        // Then
+        #expect(domain == nil)
     }
 
     @Test("Detail DTO maps to domain entity with all fields")
     func detailMaps() throws {
+        // Given
         let data = try FixtureLoader.data("pokemon_25")
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         let dto = try decoder.decode(PokemonDetailDTO.self, from: data)
+
+        // When
         let domain = dto.toDomain()
 
+        // Then
         #expect(domain.id == 25)
         #expect(domain.name == "pikachu")
         #expect(domain.heightDecimetres == 4)
@@ -55,6 +74,7 @@ struct DTOMappingTests {
 
     @Test("Detail DTO with missing sprite produces nil spriteURL")
     func detailWithoutSprite() {
+        // Given
         let dto = PokemonDetailDTO(
             id: 1,
             name: "bulbasaur",
@@ -64,6 +84,11 @@ struct DTOMappingTests {
             stats: [],
             sprites: .init(frontDefault: nil)
         )
-        #expect(dto.toDomain().spriteURL == nil)
+
+        // When
+        let domain = dto.toDomain()
+
+        // Then
+        #expect(domain.spriteURL == nil)
     }
 }

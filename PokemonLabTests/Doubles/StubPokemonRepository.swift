@@ -4,11 +4,13 @@ import Foundation
 nonisolated final class StubPokemonRepository: PokemonRepository, @unchecked Sendable {
     var listResult: Result<[PokemonSummary], Error> = .success([])
     var detailResult: Result<PokemonDetail, Error> = .failure(APIError.invalidResponse(statusCode: 404))
-    private(set) var listCalls = 0
+    private(set) var listCalls: [Int] = []
     private(set) var detailCalls: [Int] = []
 
+    var listCallCount: Int { listCalls.count }
+
     func fetchList(limit: Int) async throws -> [PokemonSummary] {
-        listCalls += 1
+        listCalls.append(limit)
         return try listResult.get()
     }
 

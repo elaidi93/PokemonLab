@@ -6,6 +6,7 @@ import Testing
 struct FetchPokemonDetailUseCaseTests {
     @Test("Forwards id to repository and returns detail")
     func happyPath() async throws {
+        // Given
         let detail = PokemonDetail(
             id: 25,
             name: "pikachu",
@@ -19,9 +20,25 @@ struct FetchPokemonDetailUseCaseTests {
         repo.detailResult = .success(detail)
         let useCase = FetchPokemonDetailUseCase(repository: repo)
 
+        // When
         let result = try await useCase(id: 25)
 
+        // Then
         #expect(result == detail)
         #expect(repo.detailCalls == [25])
+    }
+
+    @Test("Propagates repository error")
+    func propagatesFailure() async {
+        // Given
+        struct Boom: Error {}
+        let repo = StubPokemonRepository()
+        repo.detailResult = .failure(Boom())
+        let useCase = FetchPokemonDetailUseCase(repository: repo)
+
+        // When / Then
+        await #expect(throws: Boom.self) {
+            _ = try await useCase(id: 1)
+        }
     }
 }
