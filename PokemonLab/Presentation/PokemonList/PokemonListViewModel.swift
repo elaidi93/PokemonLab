@@ -41,7 +41,7 @@ final class PokemonListViewModel {
             let list = try await fetchList()
             state = .loaded(list)
         } catch {
-            state = .failed(String(localized: "list.error.message"))
+            state = .failed(String(localized: "Impossible de charger le Pokédex. Vérifie ta connexion et réessaie."))
         }
     }
 

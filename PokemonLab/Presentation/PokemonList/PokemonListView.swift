@@ -5,11 +5,11 @@ struct PokemonListView: View {
 
     var body: some View {
         content
-            .navigationTitle(Text("list.title"))
+            .navigationTitle(Text("Pokédex"))
             .searchable(
                 text: $viewModel.searchQuery,
                 placement: .navigationBarDrawer(displayMode: .always),
-                prompt: Text("list.search.placeholder")
+                prompt: Text("Rechercher un Pokémon")
             )
             .task { await viewModel.loadIfNeeded() }
             .refreshable { await viewModel.load() }
@@ -19,7 +19,7 @@ struct PokemonListView: View {
     private var content: some View {
         switch viewModel.state {
         case .idle, .loading:
-            ProgressView(Text("common.loading"))
+            ProgressView(Text("Chargement…"))
                 .controlSize(.large)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .accessibilityIdentifier("list.loading")
@@ -42,8 +42,8 @@ struct PokemonListView: View {
                     .contentShape(Rectangle())
                     .onTapGesture { viewModel.didSelect(pokemon) }
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel(Text("list.row.accessibility.\(pokemon.name).\(pokemon.id)"))
-                    .accessibilityHint(Text("list.row.hint"))
+                    .accessibilityLabel(Text("\(pokemon.name.capitalized), numéro \(pokemon.id)"))
+                    .accessibilityHint(Text("Ouvre la fiche détaillée"))
                     .accessibilityAddTraits(.isButton)
             }
         }
@@ -64,9 +64,7 @@ private struct PokemonRow: View {
         HStack(spacing: 12) {
             AsyncImageView(
                 url: pokemon.spriteURL,
-                accessibilityDescription: String(
-                    localized: "common.sprite.alt.\(pokemon.name)"
-                )
+                accessibilityDescription: String(localized: "Illustration de \(pokemon.name.capitalized)")
             )
             .frame(width: spriteSize, height: spriteSize)
 
@@ -96,15 +94,15 @@ private struct ErrorStateView: View {
 
     var body: some View {
         ContentUnavailableView {
-            Label(String(localized: "list.error.title"), systemImage: "exclamationmark.triangle")
+            Label(String(localized: "Oups"), systemImage: "exclamationmark.triangle")
         } description: {
             Text(message)
         } actions: {
             Button(action: retry) {
-                Text("list.error.retry")
+                Text("Réessayer")
             }
             .buttonStyle(.borderedProminent)
-            .accessibilityHint(Text("list.error.retry.hint"))
+            .accessibilityHint(Text("Recharge la liste des Pokémon"))
         }
     }
 }

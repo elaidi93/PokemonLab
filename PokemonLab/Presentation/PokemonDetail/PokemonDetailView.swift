@@ -14,18 +14,18 @@ struct PokemonDetailView: View {
     private var content: some View {
         switch viewModel.state {
         case .idle, .loading:
-            ProgressView(Text("common.loading"))
+            ProgressView(Text("Chargement…"))
                 .controlSize(.large)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
         case .failed(let message):
             ContentUnavailableView {
-                Label(String(localized: "detail.error.title"), systemImage: "exclamationmark.triangle")
+                Label(String(localized: "Oups"), systemImage: "exclamationmark.triangle")
             } description: {
                 Text(message)
             } actions: {
                 Button(action: { Task { await viewModel.load() } }) {
-                    Text("list.error.retry")
+                    Text("Réessayer")
                 }
                 .buttonStyle(.borderedProminent)
             }
@@ -56,16 +56,14 @@ private struct DetailContent: View {
         VStack(spacing: 8) {
             AsyncImageView(
                 url: detail.spriteURL,
-                accessibilityDescription: String(
-                    localized: "common.sprite.alt.\(detail.name)"
-                )
+                accessibilityDescription: String(localized: "Illustration de \(detail.name.capitalized)")
             )
             .frame(width: spriteSize, height: spriteSize)
 
             Text(String(format: "N°%03d", detail.id))
                 .font(.title3.monospacedDigit())
                 .foregroundStyle(.secondary)
-                .accessibilityLabel(Text("detail.number.accessibility.\(detail.id)"))
+                .accessibilityLabel(Text("Numéro \(detail.id)"))
         }
         .frame(maxWidth: .infinity)
         .accessibilityElement(children: .combine)
@@ -90,9 +88,9 @@ private struct DetailContent: View {
                 }
             }
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text("detail.types.accessibility.\(label)"))
+            .accessibilityLabel(Text("Types : \(label)"))
         } header: {
-            sectionHeader(Text("detail.types"))
+            sectionHeader(Text("Types"))
         }
     }
 
@@ -109,16 +107,16 @@ private struct DetailContent: View {
 
             VStack(spacing: 8) {
                 labeledRow(
-                    key: "detail.height",
+                    key: "Taille",
                     value: detail.heightMeters.formatted(fmt)
                 )
                 labeledRow(
-                    key: "detail.weight",
+                    key: "Poids",
                     value: detail.weightKilograms.formatted(wfmt)
                 )
             }
         } header: {
-            sectionHeader(Text("detail.measurements"))
+            sectionHeader(Text("Caractéristiques"))
         }
     }
 
@@ -130,7 +128,7 @@ private struct DetailContent: View {
                 }
             }
         } header: {
-            sectionHeader(Text("detail.stats"))
+            sectionHeader(Text("Statistiques"))
         }
     }
 
@@ -189,12 +187,16 @@ private struct StatBar: View {
         CGFloat(min(Double(stat.baseValue) / maxValue, 1.0))
     }
 
-    /// Maps PokeAPI stat names to localized keys. Falls back to the raw name
-    /// when we haven't provided a translation.
     private var localizedStatName: String {
-        let key = "detail.stat.\(stat.name)"
-        let localized = String(localized: String.LocalizationValue(key))
-        return localized == key ? stat.name.capitalized : localized
+        switch stat.name {
+        case "hp": "PV"
+        case "attack": "Attaque"
+        case "defense": "Défense"
+        case "special-attack": "Attaque spéciale"
+        case "special-defense": "Défense spéciale"
+        case "speed": "Vitesse"
+        default: stat.name.capitalized
+        }
     }
 }
 
