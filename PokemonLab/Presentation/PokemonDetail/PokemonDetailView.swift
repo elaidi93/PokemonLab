@@ -56,9 +56,12 @@ private struct DetailContent: View {
         VStack(spacing: 8) {
             AsyncImageView(
                 url: detail.spriteURL,
-                accessibilityDescription: String(localized: "Illustration de \(detail.name.capitalized)")
+                accessibilityDescription: String(localized: "Image de \(detail.name.capitalized)")
             )
             .frame(width: spriteSize, height: spriteSize)
+            .accessibilityElement()
+            .accessibilityLabel(Text("Image de \(detail.name.capitalized)"))
+            .accessibilityAddTraits(.isImage)
 
             Text(String(format: "N°%03d", detail.id))
                 .font(.title3.monospacedDigit())
@@ -66,7 +69,6 @@ private struct DetailContent: View {
                 .accessibilityLabel(Text("Numéro \(detail.id)"))
         }
         .frame(maxWidth: .infinity)
-        .accessibilityElement(children: .combine)
     }
 
     private var typesSection: some View {

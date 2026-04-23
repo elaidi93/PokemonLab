@@ -42,7 +42,7 @@ struct PokemonListView: View {
                     .contentShape(Rectangle())
                     .onTapGesture { viewModel.didSelect(pokemon) }
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel(Text("\(pokemon.name.capitalized), numéro \(pokemon.id)"))
+                    .accessibilityLabel(Text("Image de \(pokemon.name.capitalized), numéro \(pokemon.id)"))
                     .accessibilityHint(Text("Ouvre la fiche détaillée"))
                     .accessibilityAddTraits(.isButton)
             }
@@ -64,7 +64,7 @@ private struct PokemonRow: View {
         HStack(spacing: 12) {
             AsyncImageView(
                 url: pokemon.spriteURL,
-                accessibilityDescription: String(localized: "Illustration de \(pokemon.name.capitalized)")
+                accessibilityDescription: String(localized: "Image de \(pokemon.name.capitalized)")
             )
             .frame(width: spriteSize, height: spriteSize)
 

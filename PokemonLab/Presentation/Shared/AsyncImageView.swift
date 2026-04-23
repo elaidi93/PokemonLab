@@ -12,6 +12,7 @@ struct AsyncImageView: View {
                     .resizable()
                     .scaledToFit()
                     .accessibilityLabel(Text(accessibilityDescription))
+                    .accessibilityAddTraits(.isImage)
             case .failure:
                 Image(systemName: "photo")
                     .resizable()
