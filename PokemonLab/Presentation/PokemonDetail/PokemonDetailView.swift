@@ -80,12 +80,8 @@ private struct DetailContent: View {
                         .font(.callout.weight(.medium))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .background(
-                            Capsule().fill(Color.accentColor.opacity(0.18))
-                        )
-                        .overlay(
-                            Capsule().stroke(Color.accentColor.opacity(0.35), lineWidth: 1)
-                        )
+                        .background(Capsule().fill(Color.typeChipFill))
+                        .overlay(Capsule().stroke(Color.typeChipBorder, lineWidth: 1))
                         .foregroundStyle(.primary)
                 }
             }
@@ -117,6 +113,10 @@ private struct DetailContent: View {
                     value: detail.weightKilograms.formatted(wfmt)
                 )
             }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.brandSurface)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         } header: {
             sectionHeader(Text("Caractéristiques"))
         }
@@ -129,6 +129,10 @@ private struct DetailContent: View {
                     StatBar(stat: stat)
                 }
             }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.brandSurface)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         } header: {
             sectionHeader(Text("Statistiques"))
         }
