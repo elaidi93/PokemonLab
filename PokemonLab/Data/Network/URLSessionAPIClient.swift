@@ -1,6 +1,6 @@
 import Foundation
 
-struct URLSessionAPIClient: APIClient {
+nonisolated struct URLSessionAPIClient: APIClient {
     private let session: URLSession
     private let decoder: JSONDecoder
 

@@ -1,6 +1,6 @@
 import Foundation
 
-struct PokemonDetail: Identifiable, Hashable, Sendable {
+nonisolated struct PokemonDetail: Identifiable, Hashable, Sendable {
     let id: Int
     let name: String
     let heightDecimetres: Int
@@ -9,7 +9,7 @@ struct PokemonDetail: Identifiable, Hashable, Sendable {
     let stats: [Stat]
     let spriteURL: URL?
 
-    struct Stat: Hashable, Sendable, Identifiable {
+    nonisolated struct Stat: Hashable, Sendable, Identifiable {
         let name: String
         let baseValue: Int
         var id: String { name }

@@ -19,7 +19,7 @@ struct PokemonListView: View {
     private var content: some View {
         switch viewModel.state {
         case .idle, .loading:
-            ProgressView(Text("Chargement…"))
+            ProgressView("Chargement…")
                 .controlSize(.large)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .accessibilityIdentifier("list.loading")
@@ -39,15 +39,27 @@ struct PokemonListView: View {
         List {
             ForEach(viewModel.visiblePokemon) { pokemon in
                 PokemonRow(pokemon: pokemon)
-                    .contentShape(Rectangle())
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(Color.brandSurface)
+                            .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 2)
+                    )
+                    .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     .onTapGesture { viewModel.didSelect(pokemon) }
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel(Text("\(pokemon.name.capitalized), numéro \(pokemon.id)"))
+                    .accessibilityLabel(Text("Image de \(pokemon.name.capitalized), numéro \(pokemon.id)"))
                     .accessibilityHint(Text("Ouvre la fiche détaillée"))
                     .accessibilityAddTraits(.isButton)
             }
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(Color(.systemBackground))
         .overlay {
             if viewModel.visiblePokemon.isEmpty && !viewModel.searchQuery.isEmpty {
                 ContentUnavailableView.search(text: viewModel.searchQuery)
@@ -64,7 +76,7 @@ private struct PokemonRow: View {
         HStack(spacing: 12) {
             AsyncImageView(
                 url: pokemon.spriteURL,
-                accessibilityDescription: String(localized: "Illustration de \(pokemon.name.capitalized)")
+                accessibilityDescription: String(localized: "Image de \(pokemon.name.capitalized)")
             )
             .frame(width: spriteSize, height: spriteSize)
 
@@ -81,10 +93,9 @@ private struct PokemonRow: View {
 
             Image(systemName: "chevron.right")
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(Color.accentColor)
                 .accessibilityHidden(true)
         }
-        .padding(.vertical, 4)
     }
 }
 

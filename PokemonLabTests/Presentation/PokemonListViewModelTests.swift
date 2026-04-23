@@ -18,15 +18,17 @@ struct PokemonListViewModelTests {
         return (vm, repo, coordinator)
     }
 
-    private let sample = [
-        PokemonSummary(id: 1, name: "bulbasaur", spriteURL: URL(string: "https://x/1.png")!),
-        PokemonSummary(id: 4, name: "charmander", spriteURL: URL(string: "https://x/4.png")!),
-        PokemonSummary(id: 25, name: "pikachu", spriteURL: URL(string: "https://x/25.png")!),
-    ]
+    private func samplePokemon() throws -> [PokemonSummary] {
+        [
+            PokemonSummary(id: 1, name: "bulbasaur", spriteURL: try #require(URL(string: "https://x/1.png"))),
+            PokemonSummary(id: 4, name: "charmander", spriteURL: try #require(URL(string: "https://x/4.png"))),
+            PokemonSummary(id: 25, name: "pikachu", spriteURL: try #require(URL(string: "https://x/25.png"))),
+        ]
+    }
 
     @Test("load transitions idle → loaded on success")
     func loadSuccess() async throws {
-        let (sut, _, _) = makeSUT(list: .success(sample))
+        let (sut, _, _) = makeSUT(list: .success(try samplePokemon()))
 
         await sut.load()
 
@@ -49,8 +51,8 @@ struct PokemonListViewModelTests {
     }
 
     @Test("loadIfNeeded is a no-op when already loaded")
-    func loadIfNeededIdempotent() async {
-        let (sut, repo, _) = makeSUT(list: .success(sample))
+    func loadIfNeededIdempotent() async throws {
+        let (sut, repo, _) = makeSUT(list: .success(try samplePokemon()))
         await sut.loadIfNeeded()
         #expect(repo.listCalls == 1)
 
@@ -58,9 +60,9 @@ struct PokemonListViewModelTests {
         #expect(repo.listCalls == 1, "Second call should not refetch")
     }
 
-    @Test("Search filters the loaded list case- and accent-insensitively")
-    func searchFilters() async {
-        let (sut, _, _) = makeSUT(list: .success(sample))
+    @Test("Search filters the loaded list case-insensitively")
+    func searchFilters() async throws {
+        let (sut, _, _) = makeSUT(list: .success(try samplePokemon()))
         await sut.load()
 
         sut.searchQuery = "PiKa"
@@ -71,8 +73,8 @@ struct PokemonListViewModelTests {
     }
 
     @Test("Search returns empty list when nothing matches")
-    func searchNoMatch() async {
-        let (sut, _, _) = makeSUT(list: .success(sample))
+    func searchNoMatch() async throws {
+        let (sut, _, _) = makeSUT(list: .success(try samplePokemon()))
         await sut.load()
 
         sut.searchQuery = "zzz"
@@ -80,7 +82,8 @@ struct PokemonListViewModelTests {
     }
 
     @Test("didSelect pushes a detail route onto the coordinator")
-    func didSelectNavigates() async {
+    func didSelectNavigates() async throws {
+        let sample = try samplePokemon()
         let (sut, _, coordinator) = makeSUT(list: .success(sample))
         await sut.load()
 

@@ -7,8 +7,8 @@ struct FetchPokemonListUseCaseTests {
     @Test("Returns repository results on success")
     func happyPath() async throws {
         let sample = [
-            PokemonSummary(id: 1, name: "bulbasaur", spriteURL: URL(string: "https://x/1.png")!),
-            PokemonSummary(id: 25, name: "pikachu", spriteURL: URL(string: "https://x/25.png")!),
+            PokemonSummary(id: 1, name: "bulbasaur", spriteURL: try #require(URL(string: "https://x/1.png"))),
+            PokemonSummary(id: 25, name: "pikachu", spriteURL: try #require(URL(string: "https://x/25.png"))),
         ]
         let repo = StubPokemonRepository()
         repo.listResult = .success(sample)

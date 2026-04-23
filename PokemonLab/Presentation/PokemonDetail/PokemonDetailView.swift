@@ -14,7 +14,7 @@ struct PokemonDetailView: View {
     private var content: some View {
         switch viewModel.state {
         case .idle, .loading:
-            ProgressView(Text("Chargement…"))
+            ProgressView("Chargement…")
                 .controlSize(.large)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
@@ -56,9 +56,12 @@ private struct DetailContent: View {
         VStack(spacing: 8) {
             AsyncImageView(
                 url: detail.spriteURL,
-                accessibilityDescription: String(localized: "Illustration de \(detail.name.capitalized)")
+                accessibilityDescription: String(localized: "Image de \(detail.name.capitalized)")
             )
             .frame(width: spriteSize, height: spriteSize)
+            .accessibilityElement()
+            .accessibilityLabel(Text("Image de \(detail.name.capitalized)"))
+            .accessibilityAddTraits(.isImage)
 
             Text(String(format: "N°%03d", detail.id))
                 .font(.title3.monospacedDigit())
@@ -66,7 +69,6 @@ private struct DetailContent: View {
                 .accessibilityLabel(Text("Numéro \(detail.id)"))
         }
         .frame(maxWidth: .infinity)
-        .accessibilityElement(children: .combine)
     }
 
     private var typesSection: some View {
@@ -78,12 +80,8 @@ private struct DetailContent: View {
                         .font(.callout.weight(.medium))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .background(
-                            Capsule().fill(Color.accentColor.opacity(0.18))
-                        )
-                        .overlay(
-                            Capsule().stroke(Color.accentColor.opacity(0.35), lineWidth: 1)
-                        )
+                        .background(Capsule().fill(Color.typeChipFill))
+                        .overlay(Capsule().stroke(Color.typeChipBorder, lineWidth: 1))
                         .foregroundStyle(.primary)
                 }
             }
@@ -115,6 +113,10 @@ private struct DetailContent: View {
                     value: detail.weightKilograms.formatted(wfmt)
                 )
             }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.brandSurface)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         } header: {
             sectionHeader(Text("Caractéristiques"))
         }
@@ -127,6 +129,10 @@ private struct DetailContent: View {
                     StatBar(stat: stat)
                 }
             }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.brandSurface)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         } header: {
             sectionHeader(Text("Statistiques"))
         }
